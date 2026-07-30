@@ -9,8 +9,15 @@ def fetch_mempool_fees():
         return response.json()
     raise Exception(f"فشل في جلب رسوم Mempool: {response.status_code}")
 
+def fetch_wallet_stats(address):
+    url = f"https://mempool.space/api/address/{address}"
+    response = requests.get(url, timeout=10)
+    if response.status_code == 200:
+        return response.json()
+    raise Exception(f"فشل في جلب معلومات المحفظة: {response.status_code}")
+
 def main():
-    print("=== بدء رصد شبكة البيتكوين ===")
+    print("=== بدء رصد شبكة البيتكوين والمحفظة ===")
     
     # عنوان المحفظة الخاص بك
     wallet_address = "bc1qk7enhr7r8mn9gfttfrsk5xvuw2krhf0f5gpkxw"
@@ -28,7 +35,18 @@ def main():
     fees = fetch_mempool_fees()
     print(f"[+] رسوم الأولوية القصوى (Fastest): {fees.get('fastestFee')} sat/vB")
     print(f"[+] رسوم النصف ساعة (Half Hour): {fees.get('halfHourFee')} sat/vB")
-    print(f"[+] رسوم الساعة (Hour): {fees.get('hourFee')} sat/vB")
+    
+    # جلب رصيد ومعلومات المحفظة الحية
+    wallet_data = fetch_wallet_stats(wallet_address)
+    chain_stats = wallet_data.get("chain_stats", {})
+    
+    funded = chain_stats.get("funded_txo_sum", 0)
+    spent = chain_stats.get("spent_txo_sum", 0)
+    balance = funded - spent
+    
+    print(f"[+] إجمالي الأموال الواردة: {funded} ساتوشي")
+    print(f"[+] إجمالي الأموال الصادرة: {spent} ساتوشي")
+    print(f"[+] الرصيد الحالي الصافي: {balance} ساتوشي")
     
     print("=== اكتملت دورة الفحص بنجاح ===")
 
