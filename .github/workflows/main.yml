@@ -1,9 +1,9 @@
-name: Bitcoin Underground Autonomous Bot
+name: Bitcoin Autonomous Bot
 
 on:
   schedule:
-    - cron: '0 * * * *' # كيشعل راسه كل ساعة أوتوماتيكياً
-  workflow_dispatch: # كيعطيك الحق تشعلو يدوياً فوق ما بغيتي من GitHub
+    - cron: '0 * * * *' # كيدور كل ساعة
+  workflow_dispatch: # كيدعم التشغيل اليدوي
 
 jobs:
   run-bot:
@@ -22,7 +22,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
-      - name: Run Autonomous Bitcoin Script
+      - name: Run Bot
         env:
           BTC_PRIVATE_KEY: ${{ secrets.BTC_PRIVATE_KEY }}
         run: |
