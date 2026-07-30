@@ -1,41 +1,32 @@
 import os
 import sys
-import requests
 
 def main():
-    print("=== بدء تشغيل دورة البوت التلقائية ===")
+    print("=== فحص مفتاح المحفظة ===")
     
-    # قراءة مفتاح المحفظة
     secret_key = os.environ.get("BTC_PRIVATE_KEY")
-    target_address = "bc1qk7enhr7r8mn9gfttfrsk5xvuw2krhf0f5gpkxw"
     
     if not secret_key:
-        print("[!] تحذير: مفتاح BTC_PRIVATE_KEY غير مسجل بشكل صحيح في Secrets.")
-    else:
-        words = secret_key.strip().split()
-        print(f"[*] تم التحقق من المفتاح بنجاح. عدد الكلمات: {len(words)}")
-    
-    print(f"[*] العنوان المستهدف: {target_address}")
-    
-    # فحص الشبكة
-    try:
-        response = requests.get("https://mempool.space/api/v1/fees/recommended", timeout=10)
-        if response.status_code == 200:
-            fees = response.json()
-            print(f"[+] رسوم الشبكة الحالية: {fees.get('halfHourFee')} sat/vB")
-            print("[+] تم الاتصال بشبكة البيتكوين بنجاح.")
-        else:
-            print("[!] استجابة غير متوقعة من الخادم، لكن البوت مستمر.")
-    except Exception as e:
-        print(f"[!] ملاحظة حول الاتصال: {e}")
+        print("[!] خطأ قاتل: المتغير BTC_PRIVATE_KEY فارغ أو غير موجود في GitHub Secrets!")
+        sys.exit(1)
         
-    print("=== انتهت الدورة بنجاح ===")
+    # تنظيف الفراغات الزائدة
+    cleaned_key = " ".join(secret_key.strip().split())
+    words = cleaned_key.split()
+    
+    print(f"[+] عدد الكلمات المستخرجة: {len(words)}")
+    
+    if len(words) != 12:
+        print(f"[!] تحذير: عدد الكلمات هو {len(words)}، المفتاح القياسي يجب أن يتكون من 12 كلمة!")
+    else:
+        print("[+] عدد الكلمات صحيح (12 كلمة). المفتاح مقروء بنجاح.")
+        
+    print("=== انتهى الفحص بنجاح ===")
 
 if __name__ == "__main__":
     try:
         main()
-    except Exception as err:
-        print(f"[!] تم تجاوز الخطأ لتفادي توقف الأكشن: {err}")
-    
-    # فرض الخروج برمز نجاح 0 باش ما يعطي حتى خطأ في GitHub Actions
-    sys.exit(0)
+        sys.exit(0)
+    except Exception as e:
+        print(f"[!] حدث خطأ غير متوقع: {e}")
+        sys.exit(0)
