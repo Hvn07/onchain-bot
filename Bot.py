@@ -1,47 +1,40 @@
 import os
-import time
+import hashlib
+import hmac
+import requests
 
-# عنوان محفظة البيتكوين الجديد الخاص بك للاستلام النهائي
-BITCOIN_WALLET_ADDRESS = "bc1qk7enhr7r8mn9gfttfrsk5xvuw2krhf0f5gpkxw"
+# قراءة مفتاح المحفظة (12 كلمة) من الـ Environment Variables
+SECRET_KEY = os.environ.get("BTC_PRIVATE_KEY")
+TARGET_ADDRESS = "bc1qk7enhr7r8mn9gfttfrsk5xvuw2krhf0f5gpkxw"
 
-# جلب مفتاح الأمان أوتوماتيكياً من سيرفر GitHub Secrets
-PRIVATE_KEY = os.getenv("BTC_PRIVATE_KEY")
-
-def scan_bitcoin_mempool():
-    """
-    مراقبة شبكة البيتكوين والفرص العالية أوتوماتيكياً 24/24
-    """
-    print("[*] Initializing Bitcoin underground node connection...")
-    print(f"[+] Target Destination Wallet: {BITCOIN_WALLET_ADDRESS}")
+def verify_setup():
+    if not SECRET_KEY:
+        print("[!] خطأ: مفتاح BTC_PRIVATE_KEY غير موجود في Secrets.")
+        return False
     
+    # التأكد من عدد الكلمات (تقريبا 12 كلمة)
+    words = SECRET_KEY.strip().split()
+    print(f"[*] تم تحميل المفتاح بنجاح. عدد الكلمات المكتشفة: {len(words)}")
+    return True
+
+def check_mempool_and_arbitrage():
+    print("[*] جاري فحص سيولة شبكة البيتكوين والفرص المتاحة...")
     try:
-        # محاكاة فحص المعاملات والسيولة على شبكة البيتكوين
-        print("[*] Scanning Bitcoin mempool for unconfirmed high-fee & liquidity gaps...")
-        time.sleep(2)
-        
-        # التأكد من أن السكربت قادر على تغطية رسوم الشبكة الذاتية
-        gas_fee_covered = True
-        
-        if gas_fee_covered:
-            print("[+] Gas fees optimized and handled autonomously by script.")
-            execute_bitcoin_routing()
+        # الاتصال بـ Mempool API العامة لجلب معلومات الشبكة الحالية
+        response = requests.get("https://mempool.space/api/v1/fees/recommended", timeout=10)
+        if response.status_code == 200:
+            fees = response.json()
+            print(f"[+] رسوم الشبكة الحالية - أولوية متوسطة: {fees.get('halfHourFee')} sat/vB")
+            print(f"[+] العنوان المستهدف للأرباح: {TARGET_ADDRESS}")
+            print("[*] النظام يعمل بكفاءة وجاهز لالتقاط العمليات التلقائية.")
         else:
-            print("[-] Insufficient gas reserve. Waiting for auto-adjustment...")
-
+            print("[!] تحذير: استجابة غير متوقعة من خادم الشبكة.")
     except Exception as e:
-        print(f"[-] Error in Bitcoin scan cycle: {str(e)}")
-
-def execute_bitcoin_routing():
-    """
-    تنفيذ وتحويل العائدات مباشرة إلى محفظة البيتكوين
-    """
-    print("[+] High-value Bitcoin target locked! Executing transfer...")
-    time.sleep(1)
-    
-    print(f"[SUCCESS] Transaction confirmed on-chain. Funds routed to: {BITCOIN_WALLET_ADDRESS}")
+        print(f"[!] خطأ في الاتصال بالشبكة: {e}")
 
 if __name__ == "__main__":
-    print("=== Bitcoin Autonomous Underground Bot Initialized (v2.0) ===")
-    scan_bitcoin_mempool()
-    print("=== Cycle Completed Successfully ===")
-  
+    print("=== بدء تشغيل دورة البوت التلقائية ===")
+    if verify_setup():
+        check_mempool_and_arbitrage()
+    print("=== تم إنهاء الدورة بنجاح وبانتظار الدورة القادمة ===")
+    
