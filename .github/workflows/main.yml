@@ -2,8 +2,8 @@ name: Bitcoin Autonomous Bot
 
 on:
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+    - cron: '*/5 * * * *'  # كيدخل يخدم ويدير Scan كل 5 دقائق تلقائياً
+  workflow_dispatch:      # باش تقدر تشغلو يدوياً وقت ما بغيتي أيضاً
 
 jobs:
   run-bot:
