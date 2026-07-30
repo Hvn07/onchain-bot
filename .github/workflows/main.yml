@@ -2,7 +2,7 @@ name: Bitcoin Autonomous Bot
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # كيدخل يخدم ويدير Scan كل 5 دقائق تلقائياً
+    - cron: '*/5 * * * *'  # كيدخل يخدم ويدير Scan كل 5 دقائق تلقائياً 24/24 ساعة
   workflow_dispatch:      # باش تقدر تشغلو يدوياً وقت ما بغيتي أيضاً
 
 jobs:
@@ -27,4 +27,3 @@ jobs:
           BTC_PRIVATE_KEY: ${{ secrets.BTC_PRIVATE_KEY }}
         run: |
           python bot.py
-          
